@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 from model import train_model
 
-# Load model
+# -------------------------------
+# LOAD MODEL & DATA
+# -------------------------------
 model, feature_cols = train_model()
-
-# Load data
 df = pd.read_csv("cleaned_data.csv")
 
 # -------------------------------
@@ -13,23 +13,23 @@ df = pd.read_csv("cleaned_data.csv")
 # -------------------------------
 st.set_page_config(page_title="Product Dashboard", layout="wide")
 
-st.title("📊 Product Analysis Dashboard")
+st.title("📊 Product Analytics Dashboard")
 
 # -------------------------------
-# SIDEBAR
+# SIDEBAR NAVIGATION
 # -------------------------------
 menu = st.sidebar.radio("Navigation", [
-    "Dashboard",
-    "Dataset",
-    "EDA",
-    "Prediction",
-    "Insights"
+    "🏠 Dashboard",
+    "📂 Dataset",
+    "📊 EDA",
+    "🔮 Prediction",
+    "🧠 Insights"
 ])
 
 # -------------------------------
 # 🏠 DASHBOARD
 # -------------------------------
-if menu == "Dashboard":
+if menu == "🏠 Dashboard":
     st.header("Overview")
 
     col1, col2, col3 = st.columns(3)
@@ -44,17 +44,20 @@ if menu == "Dashboard":
 # -------------------------------
 # 📂 DATASET
 # -------------------------------
-elif menu == "Dataset":
+elif menu == "📂 Dataset":
     st.header("Dataset Preview")
+
     st.dataframe(df)
+
+    st.write("Shape:", df.shape)
 
 # -------------------------------
 # 📊 EDA
 # -------------------------------
-elif menu == "EDA":
+elif menu == "📊 EDA":
     st.header("Exploratory Data Analysis")
 
-    st.subheader("Correlation Heatmap")
+    st.subheader("Correlation Matrix")
     st.dataframe(df.corr())
 
     st.subheader("Price vs Rating")
@@ -63,16 +66,19 @@ elif menu == "EDA":
     st.subheader("Discount vs Rating")
     st.scatter_chart(df[["Discount", "Rating"]])
 
+    st.subheader("Stock Distribution")
+    st.bar_chart(df["Stock"].value_counts())
+
 # -------------------------------
 # 🔮 PREDICTION
 # -------------------------------
-elif menu == "Prediction":
+elif menu == "🔮 Prediction":
     st.header("Predict Product Rating")
 
     col1, col2 = st.columns(2)
 
-    price = col1.number_input("Price")
-    discount = col2.number_input("Discount")
+    price = col1.number_input("Price", min_value=0.0)
+    discount = col2.number_input("Discount", min_value=0.0)
 
     stock = st.selectbox("Stock", [0, 1])
     category = st.selectbox("Category", ["A", "B", "C", "D", "UNKNOWN"])
@@ -101,11 +107,16 @@ elif menu == "Prediction":
 # -------------------------------
 # 🧠 INSIGHTS
 # -------------------------------
-elif menu == "Insights":
+elif menu == "🧠 Insights":
     st.header("Key Insights")
 
     corr = df.corr()["Rating"].sort_values(ascending=False)
 
+    st.write("Feature Impact on Rating:")
     st.write(corr)
 
-    st.info("👉 Discount and Price influence product ratings the most.")
+    st.info("""
+    🔹 Price and Discount influence ratings significantly  
+    🔹 Stock availability affects user experience  
+    🔹 Category impacts product perception  
+    """)
